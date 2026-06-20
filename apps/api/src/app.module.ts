@@ -1,40 +1,32 @@
 import { AuthModule } from '@mguay/nestjs-better-auth';
 import { Module } from '@nestjs/common';
-import { ConfigModule } from '@nestjs/config';
+import { ConfigModule, ConfigService } from '@nestjs/config';
 
-import { typeormAdapter } from '@hedystia/better-auth-typeorm';
+import { auth } from '@core/auth/auth';
 import { TypeOrmModule } from '@nestjs/typeorm';
-import dataSource from '@shared/config/dataSource';
-import { betterAuth } from 'better-auth';
+import { initializeDataSource } from '@shared/validation/initializeDataSource';
 @Module({
   imports: [
     ConfigModule.forRoot({ isGlobal: true, envFilePath: '.env' }),
+
     TypeOrmModule.forRootAsync({
-      useFactory: () => ({
+      imports: [ConfigModule],
+      inject: [ConfigService],
+      useFactory: (configService: ConfigService) => ({
         type: 'postgres' as const,
-        host: process.env.DB_HOST,
-        port: Number(process.env.DB_PORT),
-        username: process.env.DB_USER,
-        password: process.env.DB_PASSWORD,
-        database: process.env.DB_NAME,
-        synchronize: false,
+        host: configService.get<string>('DB_HOST'),
+        port: configService.get<number>('DB_PORT'),
+        username: configService.get<string>('DB_USER'),
+        password: configService.get<string>('DB_PASSWORD'),
+        database: configService.get<string>('DB_NAME'),
+        synchronize: true,
         entities: ['dist/typeorm/entities/**/*.js', 'dist/**/*.entity.js'],
-        dataSourceFactory: async () => {
-          if (!dataSource.isInitialized) {
-            await dataSource.initialize();
-          }
-          return dataSource;
-        },
+        dataSourceFactory: initializeDataSource,
       }),
     }),
     AuthModule.forRootAsync({
       useFactory: () => ({
-        auth: betterAuth({
-          database: typeormAdapter(dataSource),
-        }),
-        secret: process.env.BETTER_AUTH_SECRET,
-        baseURL: process.env.APP_URL,
-        trustedOrigins: [process.env.APP_URL],
+        auth,
       }),
     }),
   ],
