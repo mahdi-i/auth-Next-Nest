@@ -1,6 +1,8 @@
-import { env } from 'process';
+export const accessTokenExpireTime = '15m';
+export const refreshTokenExpireTime = '14d';
 
-export const jwtConstans = {
-  secret: env.SECRETJWT,
-};
-export const MaxAge_License = 30 * 24 * 60 * 60 * 1000;
+export const accessTokenName = 'X-CINEMA-ACCESS';
+export const refreshTokenName = 'X-CINEMA-REFRESH';
+
+export const refreshTokenExpireTimeByMilliSecond = 14 * 24 * 60 * 60 * 1000; // 14-day
+export const accessTokenExpireTimeByMilliSecond = 15 * 60 * 1000; //15-min

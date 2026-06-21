@@ -4,7 +4,7 @@ import { NestExpressApplication } from '@nestjs/platform-express';
 import dataSource from '@shared/config/data-source';
 import { initSwagger } from '@shared/config/swagger.config';
 import { AllExceptionsFilter } from '@shared/filter/exception.filter';
-import * as cookieParser from 'cookie-parser';
+import cookieParser from 'cookie-parser';
 import { AppModule } from './app.module';
 async function bootstrap() {
   const app = await NestFactory.create<NestExpressApplication>(AppModule);
