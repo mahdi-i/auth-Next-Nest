@@ -3,7 +3,7 @@ version: "3.8"
 services:
   postgres:
     image: postgres:15-alpine
-    container_name: better-auth-postgres
+    container_name: auth-postgres
     restart: always
     environment:
       POSTGRES_USER: ${DB_USER}
@@ -14,13 +14,26 @@ services:
     volumes:
       - postgres_data:/var/lib/postgresql/data
     networks:
-      - better-auth-network
+      - auth-network
     env_file:
       - .env
 
+  redis:
+    image: redis:7-alpine
+    container_name: auth-redis
+    restart: always
+    ports:
+      - "${REDIS_PORT}:6379"
+    volumes:
+      - redis_data:/data
+    networks:
+      - auth-network
+    env_file:
+      - .env
 volumes:
   postgres_data:
+  redis_data:
 
 networks:
-  better-auth-network:
+  auth-network:
     driver: bridge
