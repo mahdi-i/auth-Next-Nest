@@ -1,11 +1,14 @@
+import { cn } from "@/shared/utils/shadcn/utils";
 import type { Metadata } from "next";
+import { Instrument_Sans, Roboto } from "next/font/google";
 import "./globals.css";
-import { Roboto, Instrument_Sans } from "next/font/google";
-import { cn } from "@/lib/utils";
 
-const instrumentSansHeading = Instrument_Sans({subsets:['latin'],variable:'--font-heading'});
+const instrumentSansHeading = Instrument_Sans({
+  subsets: ["latin"],
+  variable: "--font-heading",
+});
 
-const roboto = Roboto({subsets:['latin'],variable:'--font-sans'});
+const roboto = Roboto({ subsets: ["latin"], variable: "--font-sans" });
 
 export const metadata: Metadata = {
   title: "Create Next App",
@@ -18,7 +21,14 @@ export default function RootLayout({
   children: React.ReactNode;
 }>) {
   return (
-    <html lang="en" className={cn("font-sans", roboto.variable, instrumentSansHeading.variable)}>
+    <html
+      lang="en"
+      className={cn(
+        "font-sans",
+        roboto.variable,
+        instrumentSansHeading.variable,
+      )}
+    >
       <body className={`antialiased`}> {children}</body>
     </html>
   );
