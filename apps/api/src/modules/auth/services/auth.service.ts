@@ -4,7 +4,7 @@ import {
   HttpStatus,
   Injectable,
   InternalServerErrorException,
-  NotFoundException,
+  UnauthorizedException,
 } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import { Roles } from '@shared/enums/role-app.enum';
@@ -135,23 +135,25 @@ export class AuthService {
 
   async refreshToken(refreshToken: string) {
     console.log(
-      '🔄 Refresh token received:',
-      refreshToken?.substring(0, 30) + '...',
+      '🔄 Refresh token received in service:',
+      refreshToken?.substring(0, 20) + '...',
     );
 
     if (!refreshToken) {
-      throw new NotFoundException('token not provided');
+      throw new UnauthorizedException('Refresh token not provided');
     }
 
     try {
       const payload = await this.jwtService.verifyRefreshToken(refreshToken);
+      console.log('✅ Refresh token payload:', payload);
 
       const user = await this.userRepo.findOne({
         where: { id: payload.sub, refreshToken },
       });
 
       if (!user) {
-        throw new BadRequestException('this token is not related to you!');
+        console.error('❌ User not found with this refresh token');
+        throw new UnauthorizedException('Invalid refresh token');
       }
 
       const newAccessToken = await this.jwtService.generateAccessToken({
@@ -159,11 +161,11 @@ export class AuthService {
         role: user.role,
       });
 
-      console.log('✅ New access token generated');
+      console.log('✅ New access token generated for user:', user.id);
       return newAccessToken;
     } catch (error) {
-      console.error('❌ Refresh error:', error.message);
-      throw new InternalServerErrorException(error.message);
+      console.error('❌ Refresh error:', error);
+      throw error;
     }
   }
 }
