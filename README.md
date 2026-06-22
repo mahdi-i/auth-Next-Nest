@@ -84,21 +84,6 @@ Update the environment values according to your setup.
 
 ---
 
-## ⚙️ Environment Variables
-
-Example:
-
-```env
-DATABASE_URL=
-JWT_SECRET=
-JWT_EXPIRES_IN=
-REFRESH_TOKEN_SECRET=
-REFRESH_TOKEN_EXPIRES_IN=
-NEXT_PUBLIC_API_URL=
-```
-
----
-
 ## 🏃 Development
 
 Run all applications:
@@ -116,7 +101,7 @@ pnpm --filter web dev
 Run backend only:
 
 ```bash
-pnpm --filter api start:dev
+pnpm --filter api dev
 ```
 
 ---
