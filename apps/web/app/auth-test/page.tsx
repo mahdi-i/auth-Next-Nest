@@ -1,6 +1,5 @@
 import { cookies } from "next/headers";
-const BACKEND_URL =
-  process.env.NEXT_PUBLIC_BACKEND_URL ?? "http://localhost:3001";
+import { BACKEND_URL } from "../../lib/base-url/BaseUrl";
 
 export async function getServerProfile() {
   try {
@@ -64,12 +63,8 @@ export async function getServerProfile() {
     };
   }
 }
-// ✅ این صفحه هم در سرور و هم در کلاینت رندر میشه
 export default async function AuthTestPage() {
-  // دریافت دیتا از سرور
   const serverData = await getServerProfile();
-
-  console.log("📄 [Page] Server data:", serverData);
 
   return (
     <div className="min-h-screen p-8 bg-gray-50">

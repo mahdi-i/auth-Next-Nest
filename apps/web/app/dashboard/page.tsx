@@ -2,9 +2,7 @@
 
 import { useRouter } from "next/navigation";
 import { useEffect, useState } from "react";
-
-const BACKEND_URL =
-  process.env.NEXT_PUBLIC_BACKEND_URL ?? "http://localhost:3001";
+import { BACKEND_URL } from "../../lib/base-url/BaseUrl";
 
 export default function DashboardPage() {
   const router = useRouter();

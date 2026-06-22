@@ -1,11 +1,8 @@
-// app/auth/login/page.tsx
 "use client";
 
 import { useRouter } from "next/navigation";
 import { useState } from "react";
-
-const BACKEND_URL =
-  process.env.NEXT_PUBLIC_BACKEND_URL ?? "http://localhost:3001";
+import { BACKEND_URL } from "../../../lib/base-url/BaseUrl";
 
 export default function LoginPage() {
   const router = useRouter();
@@ -15,11 +12,6 @@ export default function LoginPage() {
   const [code, setCode] = useState("");
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState("");
-  const [mounted, setMounted] = useState(false);
-
-  if (!mounted) {
-    return <div>Loading...</div>;
-  }
 
   const handleSendOtp = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -80,15 +72,6 @@ export default function LoginPage() {
         } catch {
           console.log("📥 No JSON body");
         }
-
-        // ساخت user
-        const userData = data?.user || {
-          id: "user-" + Date.now(),
-          email: email,
-          role: "USER",
-        };
-
-        console.log("👤 Setting user:", userData);
 
         setTimeout(() => {
           console.log("✅ Redirecting to dashboard...");

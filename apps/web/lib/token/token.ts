@@ -17,7 +17,7 @@ export function isTokenExpired(token: string, bufferSeconds = 30): boolean {
   const payload = decodeJwtPayload(token);
   if (!payload || typeof payload.exp !== "number") return true;
 
-  const expiresAt = payload.exp * 1000; // تبدیل به millisecond
+  const expiresAt = payload.exp * 1000;
   const now = Date.now();
   const buffer = bufferSeconds * 1000;
 

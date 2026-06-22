@@ -27,36 +27,25 @@ export class AuthService {
   ) {}
   async sendOtp(dto: SendOtpDto) {
     const { email, password } = dto;
-    if (!email || !password) {
-      throw new BadRequestException('Email and password are required');
-    }
 
-    const isOtpSentBefore = await this.cacheService.get(`email:${email}`);
-    if (isOtpSentBefore) {
-      throw new HttpException(
-        'otp already sent to your email',
-        HttpStatus.TOO_MANY_REQUESTS,
-      );
-    }
     const existUser = await this.userRepo.findOne({
-      where: { email: email },
+      where: { email },
+      select: {
+        id: true,
+        email: true,
+        password: true,
+        role: true,
+        refreshToken: true,
+      },
     });
 
     if (existUser) {
+      console.log(existUser);
       if (!existUser.password) {
-        console.error(`❌ User ${email} has no password in database`);
         throw new BadRequestException(
           'Account is corrupted. Please contact support.',
         );
       }
-
-      // ✅ دیباگ: لاگ کردن اطلاعات
-      console.log(`🔍 Comparing password for user: ${email}`);
-      console.log(`📝 Password length: ${password?.length || 0}`);
-      console.log(`🔑 Hashed password exists: ${!!existUser.password}`);
-      console.log(
-        `🔑 Hashed password preview: ${existUser.password.substring(0, 20)}...`,
-      );
       const isPasswordValid = await Compare(password, existUser.password);
       if (!isPasswordValid) {
         throw new BadRequestException('Invalid password');
@@ -69,14 +58,27 @@ export class AuthService {
         300,
       );
     }
+
+    const attemptsKey = `otp_attempts:${email}`;
+    const attempts = Number((await this.cacheService.get(attemptsKey)) || 0);
+
+    if (attempts >= 5) {
+      throw new HttpException(
+        'Too many OTP requests. Please try again later.',
+        HttpStatus.TOO_MANY_REQUESTS,
+      );
+    }
+
     const otp = await this.otpService.sendOtpToEmail(email);
     const otpString = String(otp?.otp || otp);
+
     if (!otpString) {
       throw new InternalServerErrorException('Failed to generate OTP');
     }
-    const hashedOtp = await Hash(String(otpString));
-    await this.cacheService.set(`otp:${email}`, hashedOtp, 120);
-    console.log(otp);
+
+    await this.cacheService.set(`otp:${email}`, otpString, 120);
+    await this.cacheService.set(attemptsKey, attempts + 1, 600);
+
     console.log(`📧 OTP for ${email}:`, otpString);
 
     return {
@@ -88,21 +90,33 @@ export class AuthService {
   async verifyOtp(dto: VerifyOtpDto) {
     const { email, code } = dto;
 
-    const otp = await this.cacheService.get(`otp:${email}`);
-    if (!otp) {
+    const attemptsKey = `otp_verify_attempts:${email}`;
+    const attempts = Number((await this.cacheService.get(attemptsKey)) || 0);
+
+    if (attempts >= 3) {
+      await this.cacheService.del(`otp:${email}`);
+      throw new BadRequestException(
+        'Too many failed attempts. Request a new OTP.',
+      );
+    }
+
+    const storedOtp = await this.cacheService.get(`otp:${email}`);
+    if (!storedOtp) {
       throw new BadRequestException(
         'OTP expired or not found. Please request a new OTP.',
       );
     }
-    const otpString = String(otp);
-    const codeString = String(code).trim();
-    if (!(await Compare(codeString, otpString)))
-      throw new BadRequestException('invalid otp');
+
+    const isOtpValid = String(code).trim() === storedOtp;
+    if (!isOtpValid) {
+      await this.cacheService.set(attemptsKey, attempts + 1, 300);
+      throw new BadRequestException('Invalid OTP');
+    }
 
     await this.cacheService.del(`otp:${email}`);
-    let user = await this.userRepo.findOne({
-      where: { email },
-    });
+    await this.cacheService.del(attemptsKey);
+
+    let user = await this.userRepo.findOne({ where: { email } });
 
     if (!user) {
       const hashedPassword = await this.cacheService.get(
@@ -117,42 +131,45 @@ export class AuthService {
         password: hashedPassword,
         role: Roles.USER,
       });
-
       await this.userRepo.save(user);
-
       await this.cacheService.del(`temp_password:${email}`);
     }
+
     const tokens = await this.jwtService.generateToken({
       role: user.role,
       sub: user.id,
     });
 
-    user.refreshToken = tokens.refreshToken;
+    const hashedRefreshToken = await Hash(tokens.refreshToken);
+    console.log(hashedRefreshToken, '1');
+    user.refreshToken = hashedRefreshToken;
     await this.userRepo.save(user);
 
     return tokens;
   }
 
   async refreshToken(refreshToken: string) {
-    console.log(
-      '🔄 Refresh token received in service:',
-      refreshToken?.substring(0, 20) + '...',
-    );
-
     if (!refreshToken) {
       throw new UnauthorizedException('Refresh token not provided');
     }
 
     try {
       const payload = await this.jwtService.verifyRefreshToken(refreshToken);
-      console.log('✅ Refresh token payload:', payload);
 
       const user = await this.userRepo.findOne({
-        where: { id: payload.sub, refreshToken },
+        where: { id: payload.sub },
       });
 
-      if (!user) {
-        console.error('❌ User not found with this refresh token');
+      if (!user || !user.refreshToken) {
+        throw new UnauthorizedException('Invalid refresh token');
+      }
+
+      const isRefreshTokenValid = await Compare(
+        refreshToken,
+        user.refreshToken,
+      );
+
+      if (!isRefreshTokenValid) {
         throw new UnauthorizedException('Invalid refresh token');
       }
 
@@ -161,11 +178,9 @@ export class AuthService {
         role: user.role,
       });
 
-      console.log('✅ New access token generated for user:', user.id);
       return newAccessToken;
-    } catch (error) {
-      console.error('❌ Refresh error:', error);
-      throw error;
+    } catch {
+      throw new UnauthorizedException('Invalid refresh token');
     }
   }
 }

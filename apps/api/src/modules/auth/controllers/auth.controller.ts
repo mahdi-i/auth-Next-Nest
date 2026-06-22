@@ -16,7 +16,7 @@ import { AuthService } from '../services/auth.service';
 export class AuthController {
   constructor(private readonly service: AuthService) {}
   @Get('profile')
-  async getProfile(@Req() request: Request) {
+  getProfile(@Req() request: Request) {
     const user = request.user;
     return {
       id: user?.sub,
@@ -66,9 +66,6 @@ export class AuthController {
   @Public()
   async refreshToken(@Req() request: Request, @Res() response: Response) {
     const refreshToken = request.cookies?.[refreshTokenName];
-
-    console.log('📨 Cookies received:', request.cookies);
-    console.log('🔑 Refresh token from cookie:', refreshToken ? 'Yes' : 'No');
 
     if (!refreshToken) {
       return response.status(401).json({

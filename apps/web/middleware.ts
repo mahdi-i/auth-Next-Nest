@@ -1,5 +1,5 @@
 import { NextRequest, NextResponse } from "next/server";
-import { isTokenExpired } from "./lib/token";
+import { isTokenExpired } from "./lib/token/token";
 
 const BACKEND_URL =
   process.env.NEXT_PUBLIC_BACKEND_URL ?? "http://localhost:3001";
