@@ -1,4 +1,4 @@
-import { BACKEND_URL } from "@/lib/base-url/BaseUrl";
+import { BACKEND_URL } from "@/core/config/base-url/BaseUrl";
 import { cookies } from "next/headers";
 
 export async function getServerProfile() {

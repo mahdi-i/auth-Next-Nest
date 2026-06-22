@@ -1,5 +1,5 @@
 import { NextRequest, NextResponse } from "next/server";
-import { BACKEND_URL } from "./lib/base-url/BaseUrl";
+import { BACKEND_URL } from "./core/config/base-url/BaseUrl";
 import { isTokenExpired } from "./lib/token/token";
 
 const PUBLIC_PATHS = ["/login", "/register", "/_next", "/favicon.ico", "/api"];
