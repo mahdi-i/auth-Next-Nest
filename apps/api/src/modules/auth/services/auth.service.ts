@@ -79,7 +79,7 @@ export class AuthService {
     await this.cacheService.set(`otp:${email}`, otpString, 120);
     await this.cacheService.set(attemptsKey, attempts + 1, 600);
 
-    console.log(`📧 OTP for ${email}:`, otpString);
+    console.log(otpString);
 
     return {
       success: true,
