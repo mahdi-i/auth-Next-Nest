@@ -1,16 +1,8 @@
 import { NextRequest, NextResponse } from "next/server";
+import { BACKEND_URL } from "./lib/base-url/BaseUrl";
 import { isTokenExpired } from "./lib/token/token";
 
-const BACKEND_URL =
-  process.env.NEXT_PUBLIC_BACKEND_URL ?? "http://localhost:3001";
-
-const PUBLIC_PATHS = [
-  "/auth/login",
-  "/auth/register",
-  "/_next",
-  "/favicon.ico",
-  "/api",
-];
+const PUBLIC_PATHS = ["/login", "/register", "/_next", "/favicon.ico", "/api"];
 
 function isPublicPath(pathname: string) {
   return PUBLIC_PATHS.some((p) => pathname.startsWith(p));
@@ -54,7 +46,7 @@ async function refreshFromMiddleware(request: NextRequest) {
 }
 
 function redirectToLogin(request: NextRequest) {
-  const loginUrl = new URL("/auth/login", request.url);
+  const loginUrl = new URL("/login", request.url);
 
   loginUrl.searchParams.set("from", request.nextUrl.pathname);
 

@@ -1,8 +1,8 @@
 "use client";
 
+import { BACKEND_URL } from "@/lib/base-url/BaseUrl";
 import { useRouter } from "next/navigation";
 import { useEffect, useState } from "react";
-import { BACKEND_URL } from "../../lib/base-url/BaseUrl";
 
 export default function DashboardPage() {
   const router = useRouter();
@@ -31,7 +31,7 @@ export default function DashboardPage() {
         } else if (res.status === 401) {
           console.log("❌ Unauthorized");
 
-          router.push("/auth/login");
+          router.push("/login");
         }
       } catch (error) {
         console.error("❌ Error:", error);
@@ -64,7 +64,7 @@ export default function DashboardPage() {
                   "X-CINEMA-ACCESS=; path=/; expires=Thu, 01 Jan 1970 00:00:00 GMT";
                 document.cookie =
                   "X-CINEMA-REFRESH=; path=/; expires=Thu, 01 Jan 1970 00:00:00 GMT";
-                router.push("/auth/login");
+                router.push("/login");
               }}
               className="px-4 py-2 bg-red-600 text-white rounded hover:bg-red-700"
             >

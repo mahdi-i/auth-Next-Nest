@@ -1,8 +1,8 @@
 "use client";
 
+import { BACKEND_URL } from "@/lib/base-url/BaseUrl";
 import { useRouter } from "next/navigation";
 import { useState } from "react";
-import { BACKEND_URL } from "../../../lib/base-url/BaseUrl";
 
 export default function LoginPage() {
   const router = useRouter();
