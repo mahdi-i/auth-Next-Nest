@@ -7,7 +7,7 @@ import {
   MinLength,
 } from 'class-validator';
 
-export class RegisterDto {
+export class SendOtpDto {
   @ApiProperty({ example: 'example@gmail.com' })
   @IsEmail()
   email: string;

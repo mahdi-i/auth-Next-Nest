@@ -23,11 +23,9 @@ async function bootstrap() {
 
   app.use(cookieParser());
 
-  app.setGlobalPrefix('api');
-
   await dataSource.initialize();
 
-  if (process.env.NODE_ENV == 'development') initSwagger(app);
+  initSwagger(app);
 
   app.useGlobalFilters(new AllExceptionsFilter());
 

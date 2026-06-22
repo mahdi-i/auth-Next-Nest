@@ -7,11 +7,12 @@ import {
   NotFoundException,
 } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
+import { Roles } from '@shared/enums/role-app.enum';
 import { CacheService } from '@shared/services/cache.service';
 import { Compare, Hash } from '@shared/utils/hash';
 import { Repository } from 'typeorm';
-import { LoginDto } from '../dto/login.dto';
-import { RegisterDto } from '../dto/register.dto';
+import { SendOtpDto } from '../dto/send-otp.dto';
+import { VerifyOtpDto } from '../dto/verify-otp.dto';
 import { User } from '../entities/user.entity';
 import { JwtAppService } from './jwt.service';
 import { OtpService } from './otp.service';
@@ -24,8 +25,11 @@ export class AuthService {
     private readonly jwtService: JwtAppService,
     private readonly otpService: OtpService,
   ) {}
-  async register(dto: RegisterDto) {
+  async sendOtp(dto: SendOtpDto) {
     const { email, password } = dto;
+    if (!email || !password) {
+      throw new BadRequestException('Email and password are required');
+    }
 
     const isOtpSentBefore = await this.cacheService.get(`email:${email}`);
     if (isOtpSentBefore) {
@@ -35,79 +39,130 @@ export class AuthService {
       );
     }
     const existUser = await this.userRepo.findOne({
-      where: { email: dto.email },
-    });
-    if (existUser) throw new BadRequestException('This email already exists.');
-
-    const hashedPassword = await Hash(password);
-    const newUser = this.userRepo.create({
-      email,
-      password: hashedPassword,
+      where: { email: email },
     });
 
-    await this.userRepo.save(newUser);
-    return await this.otpService.sendOtpToEmail(email);
+    if (existUser) {
+      if (!existUser.password) {
+        console.error(`❌ User ${email} has no password in database`);
+        throw new BadRequestException(
+          'Account is corrupted. Please contact support.',
+        );
+      }
+
+      // ✅ دیباگ: لاگ کردن اطلاعات
+      console.log(`🔍 Comparing password for user: ${email}`);
+      console.log(`📝 Password length: ${password?.length || 0}`);
+      console.log(`🔑 Hashed password exists: ${!!existUser.password}`);
+      console.log(
+        `🔑 Hashed password preview: ${existUser.password.substring(0, 20)}...`,
+      );
+      const isPasswordValid = await Compare(password, existUser.password);
+      if (!isPasswordValid) {
+        throw new BadRequestException('Invalid password');
+      }
+    } else {
+      const hashedPassword = await Hash(password);
+      await this.cacheService.set(
+        `temp_password:${email}`,
+        hashedPassword,
+        300,
+      );
+    }
+    const otp = await this.otpService.sendOtpToEmail(email);
+    const otpString = String(otp?.otp || otp);
+    if (!otpString) {
+      throw new InternalServerErrorException('Failed to generate OTP');
+    }
+    const hashedOtp = await Hash(String(otpString));
+    await this.cacheService.set(`otp:${email}`, hashedOtp, 120);
+    console.log(otp);
+    console.log(`📧 OTP for ${email}:`, otpString);
+
+    return {
+      success: true,
+      message: 'OTP sent to your email',
+    };
   }
 
-  async login(dto: LoginDto) {
+  async verifyOtp(dto: VerifyOtpDto) {
     const { email, code } = dto;
-    const existUser = await this.userRepo.findOne({
-      where: { email: dto.email },
-    });
-    if (!existUser) {
-      throw new BadRequestException('invalid email');
-    }
 
-    const otp = await this.cacheService.get(`email:${email}`);
+    const otp = await this.cacheService.get(`otp:${email}`);
     if (!otp) {
       throw new BadRequestException(
         'OTP expired or not found. Please request a new OTP.',
       );
     }
-
-    if (!(await Compare(code, otp)))
+    const otpString = String(otp);
+    const codeString = String(code).trim();
+    if (!(await Compare(codeString, otpString)))
       throw new BadRequestException('invalid otp');
 
-    await this.cacheService.del(`email:${email}`);
-
-    const tokens = await this.jwtService.generateToken({
-      role: existUser.role,
-      sub: existUser.id,
+    await this.cacheService.del(`otp:${email}`);
+    let user = await this.userRepo.findOne({
+      where: { email },
     });
 
-    existUser.refreshToken = tokens.refreshToken;
-    await this.userRepo.save(existUser);
+    if (!user) {
+      const hashedPassword = await this.cacheService.get(
+        `temp_password:${email}`,
+      );
+      if (!hashedPassword) {
+        throw new BadRequestException('Password not found. Please try again.');
+      }
 
-    return {
-      accessToken: tokens.accessToken,
-      refreshToken: tokens.refreshToken,
-      user: {
-        id: existUser.id,
-        email: existUser.email,
-        role: existUser.role,
-      },
-    };
+      user = this.userRepo.create({
+        email,
+        password: hashedPassword,
+        role: Roles.USER,
+      });
+
+      await this.userRepo.save(user);
+
+      await this.cacheService.del(`temp_password:${email}`);
+    }
+    const tokens = await this.jwtService.generateToken({
+      role: user.role,
+      sub: user.id,
+    });
+
+    user.refreshToken = tokens.refreshToken;
+    await this.userRepo.save(user);
+
+    return tokens;
   }
 
-  async refreshToken(token?: string) {
-    if (!token) throw new NotFoundException('token not provided');
+  async refreshToken(refreshToken: string) {
+    console.log(
+      '🔄 Refresh token received:',
+      refreshToken?.substring(0, 30) + '...',
+    );
+
+    if (!refreshToken) {
+      throw new NotFoundException('token not provided');
+    }
 
     try {
-      const payload = await this.jwtService.verifyRefreshToken(token);
+      const payload = await this.jwtService.verifyRefreshToken(refreshToken);
 
       const user = await this.userRepo.findOne({
-        where: { id: payload.sub, refreshToken: token },
+        where: { id: payload.sub, refreshToken },
       });
 
       if (!user) {
         throw new BadRequestException('this token is not related to you!');
       }
 
-      return await this.jwtService.generateAccessToken({
+      const newAccessToken = await this.jwtService.generateAccessToken({
         sub: user.id,
         role: user.role,
       });
+
+      console.log('✅ New access token generated');
+      return newAccessToken;
     } catch (error) {
+      console.error('❌ Refresh error:', error.message);
       throw new InternalServerErrorException(error.message);
     }
   }

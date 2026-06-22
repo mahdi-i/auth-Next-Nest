@@ -5,3 +5,17 @@ export const extractTokenFromCookie = (request: Request) => {
     ? request.cookies[accessTokenName]
     : undefined;
 };
+
+export const extractTokenFromHeader = (
+  request: Request,
+): string | undefined => {
+  const authHeader = request.headers.authorization;
+  if (!authHeader) return undefined;
+
+  const [type, token] = authHeader.split(' ');
+  return type === 'Bearer' ? token : undefined;
+};
+
+export const extractToken = (request: Request): string | undefined => {
+  return extractTokenFromHeader(request) || extractTokenFromCookie(request);
+};
