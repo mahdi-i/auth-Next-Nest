@@ -1,5 +1,4 @@
 import type { Metadata } from "next";
-import { AuthHydrator } from "../components/AuthHydrator";
 import "./globals.css";
 
 export const metadata: Metadata = {
@@ -14,11 +13,7 @@ export default function RootLayout({
 }>) {
   return (
     <html lang="en">
-      <body className={`antialiased`}>
-        {" "}
-        <AuthHydrator />
-        {children}
-      </body>
+      <body className={`antialiased`}> {children}</body>
     </html>
   );
 }

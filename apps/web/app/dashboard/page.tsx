@@ -1,27 +1,19 @@
-// app/dashboard/page.tsx
 "use client";
 
 import { useRouter } from "next/navigation";
 import { useEffect, useState } from "react";
-import { useAuthStore } from "../../store/auth.store";
 
 const BACKEND_URL =
   process.env.NEXT_PUBLIC_BACKEND_URL ?? "http://localhost:3001";
 
 export default function DashboardPage() {
   const router = useRouter();
-  const { user, isAuthenticated, clearUser } = useAuthStore();
   const [data, setData] = useState<any>(null);
   const [loading, setLoading] = useState(true);
   const [mounted, setMounted] = useState(false);
 
-  console.log("📊 Dashboard render:", { isAuthenticated, user, mounted });
-
   useEffect(() => {
     setMounted(true);
-    console.log("🔍 Dashboard mounted");
-    console.log("📊 isAuthenticated:", isAuthenticated);
-    console.log("👤 user:", user);
 
     // دریافت اطلاعات محافظت شده
     const fetchProtectedData = async () => {
@@ -40,7 +32,7 @@ export default function DashboardPage() {
           setData(data);
         } else if (res.status === 401) {
           console.log("❌ Unauthorized");
-          clearUser();
+
           router.push("/auth/login");
         }
       } catch (error) {
@@ -51,7 +43,7 @@ export default function DashboardPage() {
     };
 
     fetchProtectedData();
-  }, [isAuthenticated, user, router, clearUser]);
+  }, []);
 
   // ✅ در طول SSR یا قبل از mount، لودینگ نشون بده
   if (!mounted || loading) {
@@ -60,11 +52,6 @@ export default function DashboardPage() {
         <div className="text-xl">Loading...</div>
       </div>
     );
-  }
-
-  // ✅ اگر لاگین نیست، چیزی نشون نده (redirect میشه)
-  if (!isAuthenticated || !user) {
-    return null;
   }
 
   return (
@@ -79,7 +66,6 @@ export default function DashboardPage() {
                   "X-CINEMA-ACCESS=; path=/; expires=Thu, 01 Jan 1970 00:00:00 GMT";
                 document.cookie =
                   "X-CINEMA-REFRESH=; path=/; expires=Thu, 01 Jan 1970 00:00:00 GMT";
-                clearUser();
                 router.push("/auth/login");
               }}
               className="px-4 py-2 bg-red-600 text-white rounded hover:bg-red-700"
@@ -92,7 +78,7 @@ export default function DashboardPage() {
             <div className="border-b pb-4">
               <h2 className="text-sm font-medium text-gray-500">User Info</h2>
               <pre className="mt-2 p-3 bg-gray-50 rounded text-sm">
-                {JSON.stringify(user, null, 2)}
+                {JSON.stringify(data, null, 2)}
               </pre>
             </div>
 

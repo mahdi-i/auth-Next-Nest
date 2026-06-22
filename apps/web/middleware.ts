@@ -38,13 +38,10 @@ async function refreshFromMiddleware(request: NextRequest) {
 
     const setCookie = refreshRes.headers.get("set-cookie");
 
-    // بک‌اند refresh کرد ولی کوکی نفرستاد
     if (!setCookie) {
       return NextResponse.next();
     }
 
-    // ⭐ نکته مهم:
-    // بعد از refresh باید request دوباره اجرا بشه
     const response = NextResponse.redirect(request.url);
 
     response.headers.set("Set-Cookie", setCookie);

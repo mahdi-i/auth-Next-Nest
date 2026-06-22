@@ -2,15 +2,13 @@
 "use client";
 
 import { useRouter } from "next/navigation";
-import { useEffect, useState } from "react";
-import { useAuthStore } from "../../../store/auth.store";
+import { useState } from "react";
 
 const BACKEND_URL =
   process.env.NEXT_PUBLIC_BACKEND_URL ?? "http://localhost:3001";
 
 export default function LoginPage() {
   const router = useRouter();
-  const { user, isAuthenticated, setUser } = useAuthStore();
   const [step, setStep] = useState<"send" | "verify">("send");
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
@@ -19,21 +17,6 @@ export default function LoginPage() {
   const [error, setError] = useState("");
   const [mounted, setMounted] = useState(false);
 
-  // ✅ فقط بعد از mount شدن، چک کن
-  useEffect(() => {
-    setMounted(true);
-    console.log("🔍 Login page mounted");
-    console.log("📊 isAuthenticated:", isAuthenticated);
-    console.log("👤 user:", user);
-
-    // ✅ اگر لاگین هست، برو به dashboard
-    if (isAuthenticated && user) {
-      console.log("✅ Already authenticated, redirecting to dashboard");
-      router.push("/dashboard");
-    }
-  }, [isAuthenticated, user, router]);
-
-  // ❌ در طول SSR، چیزی نشون نده
   if (!mounted) {
     return <div>Loading...</div>;
   }
@@ -107,14 +90,6 @@ export default function LoginPage() {
 
         console.log("👤 Setting user:", userData);
 
-        // ✅ ذخیره در store
-        setUser(userData);
-
-        // ✅ یکبار دیگه چک کن
-        const store = useAuthStore.getState();
-        console.log("📊 Store after setUser:", store);
-
-        // ✅ تاخیر برای اطمینان از ذخیره شدن
         setTimeout(() => {
           console.log("✅ Redirecting to dashboard...");
           router.push("/dashboard");
