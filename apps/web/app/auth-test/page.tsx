@@ -1,68 +1,69 @@
 import { cookies } from "next/headers";
+const BACKEND_URL =
+  process.env.NEXT_PUBLIC_BACKEND_URL ?? "http://localhost:3001";
 
-// ✅ این قسمت در سرور اجرا میشه
-async function getServerProfile() {
-  const BACKEND_URL =
-    process.env.NEXT_PUBLIC_BACKEND_URL ?? "http://localhost:3001";
-
+export async function getServerProfile() {
   try {
-    // دریافت کوکی‌ها از سرور
     const cookieStore = await cookies();
-    const accessToken = cookieStore.get("X-CINEMA-ACCESS")?.value;
+
+    let accessToken = cookieStore.get("X-CINEMA-ACCESS")?.value;
     const refreshToken = cookieStore.get("X-CINEMA-REFRESH")?.value;
 
     console.log(
       "🖥️ [Server] Access Token:",
       accessToken ? "✅ Exists" : "❌ Missing",
     );
-    console.log(
-      "🖥️ [Server] Refresh Token:",
-      refreshToken ? "✅ Exists" : "❌ Missing",
-    );
 
     if (!accessToken) {
       return {
         success: false,
-        error: "No access token on server",
-        cookies: { hasAccess: false, hasRefresh: !!refreshToken },
+        error: "No access token even after refresh",
+        cookies: {
+          hasAccess: false,
+          hasRefresh: !!refreshToken,
+        },
       };
     }
 
-    // درخواست به بک‌اند از سمت سرور
     const res = await fetch(`${BACKEND_URL}/auth/profile`, {
       headers: {
         Cookie: `X-CINEMA-ACCESS=${accessToken}`,
-        "Content-Type": "application/json",
       },
+      cache: "no-store",
     });
-
-    console.log("🖥️ [Server] Backend status:", res.status);
 
     if (res.ok) {
       const data = await res.json();
-      console.log("🖥️ [Server] Profile data:", data);
+
       return {
         success: true,
         data,
-        cookies: { hasAccess: true, hasRefresh: !!refreshToken },
-      };
-    } else {
-      return {
-        success: false,
-        error: `Backend returned ${res.status}`,
-        cookies: { hasAccess: true, hasRefresh: !!refreshToken },
+        cookies: {
+          hasAccess: true,
+          hasRefresh: !!refreshToken,
+        },
       };
     }
+
+    return {
+      success: false,
+      error: `Backend returned ${res.status}`,
+      cookies: {
+        hasAccess: false,
+        hasRefresh: !!refreshToken,
+      },
+    };
   } catch (error) {
-    console.error("🖥️ [Server] Error:", error);
     return {
       success: false,
       error: error instanceof Error ? error.message : "Unknown error",
-      cookies: { hasAccess: false, hasRefresh: false },
+      cookies: {
+        hasAccess: false,
+        hasRefresh: false,
+      },
     };
   }
 }
-
 // ✅ این صفحه هم در سرور و هم در کلاینت رندر میشه
 export default async function AuthTestPage() {
   // دریافت دیتا از سرور
