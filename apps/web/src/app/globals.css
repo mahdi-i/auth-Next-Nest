@@ -5,6 +5,8 @@
 @custom-variant dark (&:is(.dark *));
 
 :root {
+  --landing-gradient-start: #fff;
+  --landing-gradient-end: #6366f1;
   --background: oklch(1 0 0);
   --foreground: oklch(0.141 0.005 285.823);
   --card: oklch(1 0 0);
@@ -17,7 +19,7 @@
   --secondary-foreground: oklch(0.21 0.006 285.885);
   --muted: oklch(0.967 0.001 286.375);
   --muted-foreground: oklch(0.552 0.016 285.938);
-  --accent: oklch(0.967 0.001 286.375);
+  --accent: oklch(78.261% 0.00009 271.152);
   --accent-foreground: oklch(0.21 0.006 285.885);
   --destructive: oklch(0.577 0.245 27.325);
   --border: oklch(0.92 0.004 286.32);
@@ -40,8 +42,10 @@
 }
 
 .dark {
-  --background: oklch(0.141 0.005 285.823);
-  --foreground: oklch(0.985 0 0);
+  --landing-gradient-start: #0f0f1a;
+  --landing-gradient-end: #4f46e5;
+  --background: oklch(100% 0.00011 271.152);
+  --foreground: oklch(0% 0 0);
   --card: oklch(0.21 0.006 285.885);
   --card-foreground: oklch(0.985 0 0);
   --popover: oklch(0.21 0.006 285.885);
@@ -127,10 +131,12 @@
     @apply font-sans;
   }
 }
-
-.pages-container {
-  @apply w-full mx-auto max-w-340 px-5 sm:px-15;
-}
-.section-layout {
-  @apply py-8;
+@layer utilities {
+  .bg-landing-gradient {
+    background: radial-gradient(
+      125% 125% at 50% 10%,
+      var(--landing-gradient-start) 40%,
+      var(--landing-gradient-end) 100%
+    );
+  }
 }
