@@ -39,8 +39,7 @@ async function refreshFromMiddleware(request: NextRequest) {
     response.headers.set("Set-Cookie", setCookie);
 
     return response;
-  } catch (error) {
-    console.error("[Middleware] Refresh failed:", error);
+  } catch {
     return null;
   }
 }
@@ -67,7 +66,6 @@ export async function middleware(request: NextRequest) {
 
   const accessToken = request.cookies.get("X-ACCESS")?.value;
 
-  // توکن وجود نداره یا منقضی شده
   if (!accessToken || isTokenExpired(accessToken)) {
     const refreshed = await refreshFromMiddleware(request);
 
