@@ -15,6 +15,7 @@ export default function LoginPage() {
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState("");
   const [showpass, setShowPass] = useState(false);
+  console.log(1);
 
   const handleSendOtp = async (e: React.FormEvent) => {
     e.preventDefault();
