@@ -1,159 +1,244 @@
-# Turborepo starter
+# 🔐 Auth Next Nest
 
-This Turborepo starter is maintained by the Turborepo core team.
+A modern full-stack authentication starter built with **Next.js**, **NestJS**, **TurboRepo**, and **PNPM Workspaces**.
 
-## Using this example
+Designed as a scalable monorepo architecture with secure JWT authentication, refresh token flow, and a clean separation between frontend and backend applications.
 
-Run the following command:
+---
 
-```sh
-npx create-turbo@latest
+## ✨ Features
+
+* 🔑 JWT Authentication
+* 🔄 Refresh Token Flow
+* 🛡 Protected Routes & APIs
+* 🔒 Password Hashing
+* ⚡ Next.js Frontend
+* 🚀 NestJS Backend
+* 📦 Monorepo Architecture
+* 🔧 TurboRepo Caching
+* 🐳 Docker Support
+* 📝 TypeScript Everywhere
+* 🏗 Scalable Project Structure
+
+---
+
+## 📂 Project Structure
+
+```text
+.
+├── apps
+│   ├── api/        # NestJS Backend
+│   └── web/        # Next.js Frontend
+│
+├── packages/       # Shared Packages
+│
+├── .env.example
+├── docker-compose.yml
+├── package.json
+├── pnpm-workspace.yaml
+├── turbo.json
+└── README.md
 ```
 
-## What's inside?
+---
 
-This Turborepo includes the following packages/apps:
+# 🚀 Getting Started (Monorepo)
 
-### Apps and Packages
+This project is a **Turborepo + PNPM workspace** containing:
 
-- `docs`: a [Next.js](https://nextjs.org/) app
-- `web`: another [Next.js](https://nextjs.org/) app
-- `@repo/ui`: a stub React component library shared by both `web` and `docs` applications
-- `@repo/eslint-config`: `eslint` configurations (includes `eslint-config-next` and `eslint-config-prettier`)
-- `@repo/typescript-config`: `tsconfig.json`s used throughout the monorepo
+* `apps/web` → Next.js (Frontend)
+* `apps/api` → NestJS (Backend)
+* `packages/*` → Shared packages (optional)
 
-Each package/app is 100% [TypeScript](https://www.typescriptlang.org/).
+---
 
-### Utilities
+## 📦 Prerequisites
 
-This Turborepo has some additional tools already setup for you:
+* Node.js 20+
+* PNPM (recommended)
+* Docker (optional → only DB & Redis)
 
-- [TypeScript](https://www.typescriptlang.org/) for static type checking
-- [ESLint](https://eslint.org/) for code linting
-- [Prettier](https://prettier.io) for code formatting
+Install PNPM:
 
-### Build
-
-To build all apps and packages, run the following command:
-
-With [global `turbo`](https://turborepo.dev/docs/getting-started/installation#global-installation) installed (recommended):
-
-```sh
-cd my-turborepo
-turbo build
+```bash
+npm install -g pnpm
 ```
 
-Without global `turbo`, use your package manager:
+---
 
-```sh
-cd my-turborepo
-npx turbo build
-pnpm dlx turbo build
-pnpm exec turbo build
+## 📥 Installation
+
+Clone repository:
+
+```bash id="1qk3dp"
+git clone https://github.com/mahdi-i/auth-Next-Nest.git
+cd auth-Next-Nest
 ```
 
-You can build a specific package by using a [filter](https://turborepo.dev/docs/crafting-your-repository/running-tasks#using-filters):
+Install all dependencies:
 
-With [global `turbo`](https://turborepo.dev/docs/getting-started/installation#global-installation) installed:
-
-```sh
-turbo build --filter=docs
+```bash id="l9q1xa"
+pnpm install
 ```
 
-Without global `turbo`:
+> ✔ Installs dependencies for **all apps automatically (web + api + packages)**
 
-```sh
-npx turbo build --filter=docs
-pnpm exec turbo build --filter=docs
-pnpm exec turbo build --filter=docs
+---
+
+## ⚙️ Environment Setup
+
+### 🧩 1. Root Environment
+
+Create:
+
+```bash id="9v2n2a"
+cp .env.example .env
 ```
 
-### Develop
+---
 
-To develop all apps and packages, run the following command:
+### 🧩 2. Backend Environment
 
-With [global `turbo`](https://turborepo.dev/docs/getting-started/installation#global-installation) installed (recommended):
-
-```sh
-cd my-turborepo
-turbo dev
+```bash id="q9w2mz"
+cp apps/api/.env.example apps/api/.env
 ```
 
-Without global `turbo`, use your package manager:
+---
 
-```sh
-cd my-turborepo
-npx turbo dev
-pnpm exec turbo dev
-pnpm exec turbo dev
+### 🧩 3. Frontend Environment
+
+```bash id="x2m8ks"
+cp apps/web/.env.example apps/web/.env
 ```
 
-You can develop a specific package by using a [filter](https://turborepo.dev/docs/crafting-your-repository/running-tasks#using-filters):
+## 🐳 Docker (Optional)
 
-With [global `turbo`](https://turborepo.dev/docs/getting-started/installation#global-installation) installed:
+Only for database & redis:
 
-```sh
-turbo dev --filter=web
+```bash id="docker-up"
+docker compose up -d
 ```
 
-Without global `turbo`:
+Stop:
 
-```sh
-npx turbo dev --filter=web
-pnpm exec turbo dev --filter=web
-pnpm exec turbo dev --filter=web
+```bash id="docker-down"
+docker compose down
 ```
 
-### Remote Caching
+> ⚠️ Docker is NOT required for running apps
 
-> [!TIP]
-> Vercel Remote Cache is free for all plans. Get started today at [vercel.com](https://vercel.com/signup?utm_source=remote-cache-sdk&utm_campaign=free_remote_cache).
+---
 
-Turborepo can use a technique known as [Remote Caching](https://turborepo.dev/docs/core-concepts/remote-caching) to share cache artifacts across machines, enabling you to share build caches with your team and CI/CD pipelines.
+## 🏃 Development
 
-By default, Turborepo will cache locally. To enable Remote Caching you will need an account with Vercel. If you don't have an account you can [create one](https://vercel.com/signup?utm_source=turborepo-examples), then enter the following commands:
+### 🚀 Run full stack (recommended)
 
-With [global `turbo`](https://turborepo.dev/docs/getting-started/installation#global-installation) installed (recommended):
-
-```sh
-cd my-turborepo
-turbo login
+```bash id="turbo-dev"
+pnpm dev
 ```
 
-Without global `turbo`, use your package manager:
+👉 This runs automatically:
 
-```sh
-cd my-turborepo
-npx turbo login
-pnpm exec turbo login
-pnpm exec turbo login
+* Next.js → `apps/web`
+* NestJS → `apps/api`
+
+via **TurboRepo pipeline**
+
+---
+
+## 🏗 Build
+
+```bash id="build-all"
+pnpm build
 ```
 
-This will authenticate the Turborepo CLI with your [Vercel account](https://vercel.com/docs/concepts/personal-accounts/overview).
+or:
 
-Next, you can link your Turborepo to your Remote Cache by running the following command from the root of your Turborepo:
-
-With [global `turbo`](https://turborepo.dev/docs/getting-started/installation#global-installation) installed:
-
-```sh
-turbo link
+```bash id="turbo-build"
+turbo run build
 ```
 
-Without global `turbo`:
+---
 
-```sh
-npx turbo link
-pnpm exec turbo link
-pnpm exec turbo link
+## 🧹 Quality
+
+```bash id="lint"
+pnpm lint
+pnpm format
+pnpm check-types
 ```
 
-## Useful Links
+---
 
-Learn more about the power of Turborepo:
+## 📌 Scripts Summary
 
-- [Tasks](https://turborepo.dev/docs/crafting-your-repository/running-tasks)
-- [Caching](https://turborepo.dev/docs/crafting-your-repository/caching)
-- [Remote Caching](https://turborepo.dev/docs/core-concepts/remote-caching)
-- [Filtering](https://turborepo.dev/docs/crafting-your-repository/running-tasks#using-filters)
-- [Configuration Options](https://turborepo.dev/docs/reference/configuration)
-- [CLI Usage](https://turborepo.dev/docs/reference/command-line-reference)
+| Command                 | Description                                      |
+| ----------------------- | ------------------------------------------------ |
+| `pnpm install`          | Install all workspace dependencies               |
+| `pnpm dev`              | Run **frontend + backend automatically (Turbo)** |
+| `pnpm build`            | Build all apps                                   |
+| `pnpm lint`             | Lint all apps                                    |
+| `pnpm format`           | Format code                                      |
+| `pnpm check-types`      | Type check                                       |
+| `pnpm --filter web dev` | Run frontend only                                |
+| `pnpm --filter api dev` | Run backend only                                 |
+
+---
+
+## 🚀 Recommended Workflow
+
+```bash id="workflow"
+docker compose up -d
+pnpm install
+pnpm dev
+```
+
+---
+
+## 📦 Monorepo Benefits
+
+This repository uses **TurboRepo** and **PNPM Workspaces** to:
+
+* Share code between applications
+* Speed up builds through caching
+* Simplify dependency management
+* Scale multiple applications in a single repository
+
+---
+
+## 🛠 Tech Stack
+
+### Frontend
+
+* Next.js
+* React
+* TypeScript
+* Tailwind CSS
+
+### Backend
+
+* NestJS
+* TypeScript
+* JWT
+* Passport
+* PostgreSQL
+
+### Tooling
+
+* TurboRepo
+* PNPM Workspaces
+* Docker
+
+---
+
+## 🤝 Contributing
+
+Contributions are welcome.
+
+1. Fork the repository
+2. Create your feature branch
+3. Commit your changes
+4. Push your branch
+5. Open a Pull Request
+
+---

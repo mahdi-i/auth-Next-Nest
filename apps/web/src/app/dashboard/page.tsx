@@ -61,9 +61,9 @@ export default function DashboardPage() {
             <button
               onClick={() => {
                 document.cookie =
-                  "X-CINEMA-ACCESS=; path=/; expires=Thu, 01 Jan 1970 00:00:00 GMT";
+                  "X-ACCESS=; path=/; expires=Thu, 01 Jan 1970 00:00:00 GMT";
                 document.cookie =
-                  "X-CINEMA-REFRESH=; path=/; expires=Thu, 01 Jan 1970 00:00:00 GMT";
+                  "X-REFRESH=; path=/; expires=Thu, 01 Jan 1970 00:00:00 GMT";
                 router.push("/login");
               }}
               className="px-4 py-2 bg-red-600 text-white rounded hover:bg-red-700"

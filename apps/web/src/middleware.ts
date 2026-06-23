@@ -10,7 +10,7 @@ function isPublicPath(pathname: string) {
 
 async function refreshFromMiddleware(request: NextRequest) {
   try {
-    const refreshToken = request.cookies.get("X-CINEMA-REFRESH")?.value;
+    const refreshToken = request.cookies.get("X-REFRESH")?.value;
 
     if (!refreshToken) {
       return null;
@@ -19,7 +19,7 @@ async function refreshFromMiddleware(request: NextRequest) {
     const refreshRes = await fetch(`${BACKEND_URL}/auth/refresh-token`, {
       method: "POST",
       headers: {
-        Cookie: `X-CINEMA-REFRESH=${refreshToken}`,
+        Cookie: `X-REFRESH=${refreshToken}`,
         "Content-Type": "application/json",
       },
     });
@@ -39,8 +39,7 @@ async function refreshFromMiddleware(request: NextRequest) {
     response.headers.set("Set-Cookie", setCookie);
 
     return response;
-  } catch (error) {
-    console.error("[Middleware] Refresh failed:", error);
+  } catch {
     return null;
   }
 }
@@ -52,8 +51,8 @@ function redirectToLogin(request: NextRequest) {
 
   const response = NextResponse.redirect(loginUrl);
 
-  response.cookies.delete("X-CINEMA-ACCESS");
-  response.cookies.delete("X-CINEMA-REFRESH");
+  response.cookies.delete("X-ACCESS");
+  response.cookies.delete("X-REFRESH");
 
   return response;
 }
@@ -65,9 +64,8 @@ export async function middleware(request: NextRequest) {
     return NextResponse.next();
   }
 
-  const accessToken = request.cookies.get("X-CINEMA-ACCESS")?.value;
+  const accessToken = request.cookies.get("X-ACCESS")?.value;
 
-  // توکن وجود نداره یا منقضی شده
   if (!accessToken || isTokenExpired(accessToken)) {
     const refreshed = await refreshFromMiddleware(request);
 
