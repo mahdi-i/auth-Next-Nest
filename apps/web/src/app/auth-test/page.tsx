@@ -5,8 +5,8 @@ export async function getServerProfile() {
   try {
     const cookieStore = await cookies();
 
-    let accessToken = cookieStore.get("X-CINEMA-ACCESS")?.value;
-    const refreshToken = cookieStore.get("X-CINEMA-REFRESH")?.value;
+    let accessToken = cookieStore.get("X-ACCESS")?.value;
+    const refreshToken = cookieStore.get("X-REFRESH")?.value;
 
     console.log(
       "🖥️ [Server] Access Token:",
@@ -26,7 +26,7 @@ export async function getServerProfile() {
 
     const res = await fetch(`${BACKEND_URL}/auth/profile`, {
       headers: {
-        Cookie: `X-CINEMA-ACCESS=${accessToken}`,
+        Cookie: `X-ACCESS=${accessToken}`,
       },
       cache: "no-store",
     });
