@@ -40,16 +40,23 @@ Designed as a scalable monorepo architecture with secure JWT authentication, ref
 └── README.md
 ```
 
+---
+
+# 🚀 Getting Started (Monorepo)
+
+This project is a **Turborepo + PNPM workspace** containing:
+
+* `apps/web` → Next.js (Frontend)
+* `apps/api` → NestJS (Backend)
+* `packages/*` → Shared packages (optional)
 
 ---
 
-## 🚀 Getting Started
-
-### Prerequisites
+## 📦 Prerequisites
 
 * Node.js 20+
-* PNPM
-* Docker (Optional)
+* PNPM (recommended)
+* Docker (optional → only DB & Redis)
 
 Install PNPM:
 
@@ -61,100 +68,130 @@ npm install -g pnpm
 
 ## 📥 Installation
 
-Clone the repository:
+Clone repository:
 
-```bash
+```bash id="1qk3dp"
 git clone https://github.com/mahdi-i/auth-Next-Nest.git
 cd auth-Next-Nest
 ```
 
-Install dependencies:
+Install all dependencies:
 
-```bash
+```bash id="l9q1xa"
 pnpm install
 ```
 
-Create environment variables:
+> ✔ Installs dependencies for **all apps automatically (web + api + packages)**
 
-```bash
+---
+
+## ⚙️ Environment Setup
+
+### 🧩 1. Root Environment
+
+Create:
+
+```bash id="9v2n2a"
 cp .env.example .env
 ```
 
-Update the environment values according to your setup.
+---
+
+### 🧩 2. Backend Environment
+
+```bash id="q9w2mz"
+cp apps/api/.env.example apps/api/.env
+```
+
+---
+
+### 🧩 3. Frontend Environment
+
+```bash id="x2m8ks"
+cp apps/web/.env.example apps/web/.env
+```
+
+## 🐳 Docker (Optional)
+
+Only for database & redis:
+
+```bash id="docker-up"
+docker compose up -d
+```
+
+Stop:
+
+```bash id="docker-down"
+docker compose down
+```
+
+> ⚠️ Docker is NOT required for running apps
 
 ---
 
 ## 🏃 Development
 
-Run all applications:
+### 🚀 Run full stack (recommended)
 
-```bash
+```bash id="turbo-dev"
 pnpm dev
 ```
 
-Run frontend only:
+👉 This runs automatically:
 
-```bash
-pnpm --filter web dev
-```
+* Next.js → `apps/web`
+* NestJS → `apps/api`
 
-Run backend only:
-
-```bash
-pnpm --filter api dev
-```
+via **TurboRepo pipeline**
 
 ---
 
 ## 🏗 Build
 
-Build all applications:
-
-```bash
+```bash id="build-all"
 pnpm build
 ```
 
-Or:
+or:
 
-```bash
+```bash id="turbo-build"
 turbo run build
 ```
 
 ---
 
-## 🧹 Lint
+## 🧹 Quality
 
-```bash
+```bash id="lint"
 pnpm lint
+pnpm format
+pnpm check-types
 ```
 
 ---
 
-## 🐳 Docker
+## 📌 Scripts Summary
 
-Start containers:
-
-```bash
-docker-compose up -d
-```
-
-Stop containers:
-
-```bash
-docker-compose down
-```
+| Command                 | Description                                      |
+| ----------------------- | ------------------------------------------------ |
+| `pnpm install`          | Install all workspace dependencies               |
+| `pnpm dev`              | Run **frontend + backend automatically (Turbo)** |
+| `pnpm build`            | Build all apps                                   |
+| `pnpm lint`             | Lint all apps                                    |
+| `pnpm format`           | Format code                                      |
+| `pnpm check-types`      | Type check                                       |
+| `pnpm --filter web dev` | Run frontend only                                |
+| `pnpm --filter api dev` | Run backend only                                 |
 
 ---
 
-## 📜 Available Scripts
+## 🚀 Recommended Workflow
 
-| Command           | Description                 |
-| ----------------- | --------------------------- |
-| `pnpm dev`        | Run all apps in development |
-| `pnpm build`      | Build all applications      |
-| `pnpm lint`       | Run linting                 |
-| `pnpm test`       | Run tests                   |
-| `turbo run build` | Build using TurboRepo       |
+```bash id="workflow"
+docker compose up -d
+pnpm install
+pnpm dev
+```
 
 ---
 
