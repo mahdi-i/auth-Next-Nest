@@ -40,7 +40,6 @@ function Card({
     />
   );
 }
-
 function CardHeader({ className, ...props }: React.ComponentProps<"div">) {
   return (
     <div
@@ -115,10 +114,10 @@ function CardFooter({ className, ...props }: React.ComponentProps<"div">) {
 
 export {
   Card,
-  CardAction,
-  CardContent,
-  CardDescription,
-  CardFooter,
   CardHeader,
+  CardFooter,
   CardTitle,
+  CardAction,
+  CardDescription,
+  CardContent,
 };

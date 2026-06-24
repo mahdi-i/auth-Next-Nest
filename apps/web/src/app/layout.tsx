@@ -23,7 +23,8 @@ export default function RootLayout({
 }>) {
   return (
     <html
-      lang="en"
+      lang="fa"
+      dir="rtl"
       className={cn(
         "font-sans",
         roboto.variable,
