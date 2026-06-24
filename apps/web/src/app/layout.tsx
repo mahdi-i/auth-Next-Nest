@@ -1,8 +1,9 @@
 import { cn } from "@/shared/utils/shadcn/utils";
 import type { Metadata } from "next";
 import { Instrument_Sans, Roboto } from "next/font/google";
+import NextTopLoader from "nextjs-toploader";
+import { Toaster } from "sonner";
 import "./globals.css";
-
 const instrumentSansHeading = Instrument_Sans({
   subsets: ["latin"],
   variable: "--font-heading",
@@ -29,7 +30,11 @@ export default function RootLayout({
         instrumentSansHeading.variable,
       )}
     >
-      <body className={`antialiased`}> {children}</body>
+      <body className={`antialiased`}>
+        <NextTopLoader color="oklch(0.508 0.118 165.612)" />
+        <Toaster />
+        {children}
+      </body>
     </html>
   );
 }
