@@ -13,7 +13,7 @@ async function AuthComponents({
   return (
     <>
       <AuthToast />
-      <Card size="sm" className="max-w-max mx-auto ">
+      <Card size="sm" className="max-w-md mx-auto ">
         <CardContent>
           <LoginHeader />
           {step === "send" ? (

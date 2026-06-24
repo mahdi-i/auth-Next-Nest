@@ -1,5 +1,5 @@
 "use client";
-import { H2, P } from "@/shared/components/custom/ui/typography/typography";
+import { H2, Small } from "@/shared/components/custom/ui/typography/typography";
 import { useSearchParams } from "next/navigation";
 import { AuthStep } from "../../../assets/@types/types";
 
@@ -19,9 +19,9 @@ function LoginHeader() {
   };
 
   return (
-    <div className="text-center">
-      <H2 className="text-3xl font-bold text-gray-800">{titles[step]}</H2>
-      <P className="text-gray-600 text-sm mt-1">{subtitles[step]}</P>
+    <div className="text-center mb-5">
+      <H2>{titles[step]}</H2>
+      <Small className="">{subtitles[step]}</Small>
     </div>
   );
 }

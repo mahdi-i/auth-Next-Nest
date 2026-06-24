@@ -2,6 +2,7 @@ import { sendOtpAction } from "@/features/auth/actions/sendOtpAction";
 import { Button } from "@/shared/components/shadcn/button";
 import { Input } from "@/shared/components/shadcn/input";
 import Form from "next/form";
+import { PasswordInput } from "./PasswordInput";
 function OtpSendForm({
   email,
   password,
@@ -17,7 +18,11 @@ function OtpSendForm({
         placeholder="example@email.com"
         defaultValue={email}
       />
-      <Input name="password" type="password" defaultValue={password} />
+      <PasswordInput
+        name="password"
+        defaultValue={password}
+        placeholder="******"
+      />
       <Button type="submit" className="w-full" size={"lg"}>
         Send OTP
       </Button>
