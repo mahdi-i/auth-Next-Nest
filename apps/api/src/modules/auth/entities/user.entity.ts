@@ -32,6 +32,8 @@ export class User extends BaseEntity {
   })
   gender: GenderEnum;
 
-  @Column({ nullable: true })
-  refreshToken?: string;
+  @Column({
+    nullable: true,
+  })
+  refreshToken: string;
 }

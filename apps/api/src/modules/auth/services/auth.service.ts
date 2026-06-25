@@ -7,6 +7,10 @@ import {
   UnauthorizedException,
 } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
+import {
+  accessTokenName,
+  refreshTokenName,
+} from '@shared/constants/jwt.constants';
 import { Roles } from '@shared/enums/role-app.enum';
 import { CacheService } from '@shared/services/cache.service';
 import { Compare, Hash } from '@shared/utils/hash';
@@ -181,6 +185,29 @@ export class AuthService {
       return newAccessToken;
     } catch {
       throw new UnauthorizedException('Invalid refresh token');
+    }
+  }
+
+  async logout(userId: string) {
+    try {
+      const user = await this.userRepo.findOne({ where: { id: userId } });
+
+      if (!user) {
+        throw new BadRequestException('User not found');
+      }
+
+      if (user.refreshToken) {
+        user.refreshToken = '';
+        await this.userRepo.save(user);
+      }
+
+      return {
+        success: true,
+        message: 'Logged out successfully',
+        cookiesToClear: [accessTokenName, refreshTokenName],
+      };
+    } catch {
+      throw new InternalServerErrorException('Logout failed');
     }
   }
 }

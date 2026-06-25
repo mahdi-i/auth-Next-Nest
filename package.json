@@ -1,5 +1,5 @@
 {
-  "name": "kala-plus",
+  "name": "authNN",
   "private": true,
   "scripts": {
     "build": "turbo run build",
