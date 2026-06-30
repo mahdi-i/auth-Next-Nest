@@ -1,0 +1,38 @@
+import {
+  InputOTP,
+  InputOTPGroup,
+  InputOTPSlot,
+} from "@/shared/components/shadcn/input-otp/input-otp";
+
+interface OtpInputFieldProps {
+  value: string;
+  onChange: (value: string) => void;
+  length?: number;
+  onComplete?: (value: string) => void;
+}
+
+export default function OtpInputField({
+  value,
+  onChange,
+  length = 6,
+  onComplete,
+}: OtpInputFieldProps) {
+  return (
+    <div className="flex justify-center" dir="ltr">
+      <InputOTP
+        maxLength={length}
+        value={value}
+        onChange={onChange}
+        onComplete={onComplete}
+        pattern="^[0-9]+$"
+        inputMode="numeric"
+      >
+        <InputOTPGroup>
+          {Array.from({ length }, (_, index) => (
+            <InputOTPSlot key={index} index={index} />
+          ))}
+        </InputOTPGroup>
+      </InputOTP>
+    </div>
+  );
+}

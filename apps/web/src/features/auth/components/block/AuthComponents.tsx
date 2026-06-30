@@ -1,8 +1,8 @@
 import { Card, CardContent } from "@/shared/components/shadcn/card";
 import { AuthStep } from "../../assets/@types/types";
 import AuthToast from "../ui/auth/AuthToast";
-import OtpSendForm from "../ui/auth/OtpSendForm";
-import VerifyForm from "../ui/auth/VerifyForm";
+import OtpSendForm from "../ui/auth/otp-send-form/OtpSendForm";
+import VerifyForm from "../ui/auth/verify-form/VerifyForm";
 
 async function AuthComponents({
   searchParams,
