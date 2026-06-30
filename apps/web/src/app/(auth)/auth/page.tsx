@@ -1,5 +1,5 @@
 import AuthComponents from "@/features/auth/components/block/AuthComponents";
-import SectionLayout from "@/shared/components/custom/ui/wrapper/SectionLayout";
+import BGAuth from "@/features/auth/components/ui/auth/BGAuth";
 
 export default function LoginPage({
   searchParams,
@@ -7,8 +7,12 @@ export default function LoginPage({
   searchParams: Promise<{ [key: string]: string | string[] | undefined }>;
 }) {
   return (
-    <SectionLayout classname="flex justify-center h-screen items-center">
-      <AuthComponents searchParams={searchParams} />
-    </SectionLayout>
+    <div className="relative min-h-screen overflow-hidden flex items-center justify-center px-6">
+      <BGAuth />
+
+      <div className="w-full max-w-sm">
+        <AuthComponents searchParams={searchParams} />
+      </div>
+    </div>
   );
 }
